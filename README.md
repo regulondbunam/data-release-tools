@@ -1,63 +1,66 @@
-# [Software name]
+# Data Release Tools
 
 # Description
 
-[High-level description, describing what exactly software does.]
+These modules are used for the ETL process from Ecocyc to RegulonDB, they fulfill the tasks of schema loading, validation, ID creation, ID replacement and data loading.
 
 # Motivation
 
-[Why the software does things the way it does and why it was designed in the first place. What problems are solved by it. Links to publications and comparisons to similar software.]
-
-
+These modules were created in order to create persistent IDs for Ecocyc data in RegulonDB. Together with Ecocyc Extractor module can perform the ETL process.
 
 # System requirements
 
-[If the software does make high demand on particular resources, then this should be clearly advertised and explained.]
+- Software:
+  - Python 3.9
+  - Python 2.7
+- Hardware:
+  - RAM: 4 GB / 6 GB
+  - Storage: 500 MB
 
-# Install 
+# Install
 
-[This may be described in a separate INSTALL file, but the README must then clearly state this.]
-
-
+[Install guide](INSTALL.md)
 
 # Quick start
 
-[How the first task can be performed with the software, or, in the more extensive  documentation, a link to the quick start. Outlines how to quickly get started with the software using a basic yet practical example]
+It is recommended to use a Snakemake script to run all modules together.
+For more details see the operation manuals of each module.
 
+- [schema_loader](src/schema_loader/docs/MO.md)
+- [data_validator](src/data_validator/docs/MO.md)
+- [create_identifiers](src/create_identifiers/docs/MO.md)
+- [replace_identifiers](src/replace_identifiers/docs/MO.md)
+- [data_uploader](src/data_uploader/docs/MO.md)
 
+# Project website
 
-# Project website 
-
-[Website where the software is described and allows users to obtain it as well as its documentation.]
+###### Pending
 
 # License
 
-[Defines the set of rules and conditions for people who want to use the software.]
+**MIT**
 
 # Support contact information
 
-[It should be clear where to go for support, for example a contact e-mail address]
+[Support contact](http://regulondb.ccg.unam.mx/menu/about_regulondb/contact_us/index.jsp)
 
 # Software quality checklist
 
-[This may describe the state of the code, providing the necessary guidance on which aspects could be improved]
-
 **Accessibility**
 
-- [ ] Unique DOI [identifier](http://....) (Please update identifier and link)
-- [ ] Version control system
+- [x] Version control system
 
 **Documentation**
 
-- [ ] README file
+- [x] README file
 
 **Learnability**
 
-- [ ] Quick start
+- [x] Quick start
 
 **Buildability**
 
-- [ ] INSTALL file
+- [x] INSTALL file
 
 **Identity**
 
@@ -65,38 +68,33 @@
 
 **Copyright & Licensing**
 
-- [ ] LICENSE file
+- [x] LICENSE file
 
 **Portability**
 
-- [ ] Multiple platforms
-- [ ] Browsers
+- [x] Multiple platforms
 
 **Supportability**
 
-- [ ] E-mail address
-- [ ] Issue tracker
-- [ ] Slack
-- [ ] Gitter
+- [x] E-mail address
+- [x] Issue tracker
 
 **Analysability**
 
-- [ ] Source code structured
-- [ ] Sensible names
-- [ ] Coding standards - [style guides](http://google.github.io/styleguide/)
+- [x] Source code structured
+- [x] Sensible names
+- [x] Coding standards - [style guides](http://google.github.io/styleguide/)
 
 **Changeability**
 
-- [ ] CONTRIBUTING file
-- [ ] Code of Conduct file
-- [ ] Code changes, and their authorship, publicly visible
+- [x] CONTRIBUTING file
+- [x] Code of Conduct file
+- [x] Code changes, and their authorship, publicly visible
 
 **Reusability**
 
-- [ ] Source code set up in a modular fashion
+- [x] Source code set up in a modular fashion
 
 **Security & Privacy**
 
-- [ ] Passwords must never be stored in unhashed form
-
-
+- [x] Passwords must never be stored in unhashed form
