@@ -9,7 +9,7 @@
 .LSOverride
 __pycache__
 .vscode
-
+*.pyc
 # Icon must end with two \r
 Icon
 

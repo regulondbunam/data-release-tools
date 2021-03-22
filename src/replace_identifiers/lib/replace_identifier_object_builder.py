@@ -247,7 +247,17 @@ def regulatory_interaction(json_object, identifiers, collection_name):
 
     # replacing citation_ids
     replace_citations_ids(json_object, identifiers)
-
+    
+    # replacing accessoryProteins
+    mapped_proteins_ids = identifiers["regulatoryComplexes"]
+    mapped_proteins_ids.update(identifiers["products"])
+    
+    new_proteins_ids = []
+    for protein_id in json_object.get("accessoryProteins",[]):
+        new_proteins_ids.append(mapped_proteins_ids[protein_id])
+    if new_proteins_ids != []:
+        json_object["accessoryProteins"]=new_proteins_ids
+    
     # replacing gene_id
     gene = json_object.get("gene", None)
     if gene is not None:
@@ -260,20 +270,6 @@ def regulatory_interaction(json_object, identifiers, collection_name):
     for promoter in json_object.get("promoters", []):
         source_promoter_id = promoter["promoters_id"]
         promoter["promoters_id"] = mapped_promoter_ids[source_promoter_id]
-
-    # replacing regulated_entity id
-    '''
-    for regulated_entity in json_object.get("regulatedEntities", []):
-        regulated_type = regulated_entity.get("type", None)
-        source_regulated_entity_id = regulated_entity.get("_id", None)
-        if regulated_type == "gene":
-            mapped_regulated_entity_ids = identifiers["genes"]
-        elif regulated_type == "transcriptionUnit":
-            mapped_regulated_entity_ids = identifiers["transcriptionUnits"]
-        else:
-            mapped_regulated_entity_ids = identifiers["promoters"]
-        regulated_entity["_id"] = mapped_regulated_entity_ids[source_regulated_entity_id]
-    '''
 
     # replacing regulated_entity id
     regulated_entity = json_object.get("regulatedEntity", None)
