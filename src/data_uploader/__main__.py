@@ -16,7 +16,7 @@ def get_data(directory):
         if json_data:
             collection_name = json_data["collectionName"]
             data = json_data["collectionData"]
-            collection_data[collection_name] = data
+            collection_data.setdefault(collection_name, []).extend(data)
     return collection_data
 
 
@@ -32,7 +32,8 @@ def read_json(filename):
 
 def set_log(log_path):
     if not os.path.isdir(log_path):
-        raise IOError("{} directory does not exist, please edit your log argument value".format(log_path))
+        raise IOError(
+            "{} directory does not exist, please edit your log argument value".format(log_path))
     log_path = os.path.join(log_path, 'data_uploader.log')
     logging.basicConfig(filename=log_path,
                         format='%(levelname)s - %(asctime)s - %(message)s', filemode='w', level=logging.INFO)
