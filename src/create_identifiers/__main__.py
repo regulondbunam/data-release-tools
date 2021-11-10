@@ -6,6 +6,7 @@ from create_identifiers.lib import utils
 from create_identifiers.lib import arguments
 
 from create_identifiers.regulondb_multigenomic import multigenomic_identifiers
+from create_identifiers.regulondb_ht import ht_identifiers
 
 
 def run(input_path, **kwargs):
@@ -22,7 +23,7 @@ def run(input_path, **kwargs):
     if database == "regulondbmultigenomic":
         multigenomic_identifiers.manage_ids(jsons_data, **kwargs)
     elif database == "regulondbht":
-        pass
+        ht_identifiers.manage_ids(jsons_data, **kwargs)
     elif database == "regulondbdatamarts":
         pass
     else:
@@ -51,4 +52,3 @@ if __name__ == "__main__":
     utils.set_log(arguments.log)
 
     run(input_data_directory, **kwargs)
-
