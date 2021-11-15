@@ -19,7 +19,8 @@ def build_identifier_object(object_id, **kwargs):
         "sourceDBName": kwargs.get("sourceDBName", None),
         "sourceDBVersion": kwargs.get("sourceDBVersion", None),
         "subClassAcronym": kwargs.get("subClassAcronym", None),
-        "type": kwargs.get("type", None)
+        "type": kwargs.get("type", None),
+        "datasetType": kwargs.get("uniqueDataString", None)[0]
     }
 
     return identifier

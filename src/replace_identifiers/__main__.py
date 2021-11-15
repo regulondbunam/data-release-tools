@@ -6,7 +6,7 @@ import identifiers_api
 
 from lib import utils
 from lib import arguments
-from lib.replace_identifier_object_builder import mg_replace_ids_builder
+from lib.replace_identifier_object_builder import mg_replace_ids_builder, ht_replace_ids_builder
 
 
 def create_json(filename, collection_name, collection_data, output_path):
@@ -39,6 +39,24 @@ def replace_mg_identifiers(jsons_data, regulondb_version, organism, output_path=
         create_json(filename, collection_name, collection_data, output_path)
 
 
+def replace_ht_identifiers(jsons_data, regulondb_version, organism, output_path=None):
+    htdb_identifiers = identifiers_api.regulondbht.get_all_identifiers(
+        regulondb_version, organism)
+    for filename, dataset in jsons_data.items():
+        collection_name = dataset.get("collectionName")
+        collection_data = dataset.get("collectionData")
+
+        if collection_name not in ht_replace_ids_builder:
+            raise NotImplementedError(
+                "There's currently no identifier process for the {} collection.\n\t Skipping this collection data".format(collection_name))
+
+        for json_object in collection_data:
+            ht_replace_ids_builder[collection_name](
+                json_object, htdb_identifiers, collection_name)
+
+        create_json(filename, collection_name, collection_data, output_path)
+
+
 def set_log(log_path):
     if not os.path.isdir(log_path):
         raise IOError(
@@ -54,7 +72,8 @@ def run(regulondb_version, organism, input_path, output_path, database):
         replace_mg_identifiers(
             input_files, regulondb_version, organism, output_path)
     elif database == "regulondbht":
-        pass
+        replace_ht_identifiers(
+            input_files, regulondb_version, organism, output_path)
     elif database == "regulondbdatamarts":
         pass
     else:

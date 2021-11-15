@@ -247,17 +247,17 @@ def regulatory_interaction(json_object, identifiers, collection_name):
 
     # replacing citation_ids
     replace_citations_ids(json_object, identifiers)
-    
+
     # replacing accessoryProteins
     mapped_proteins_ids = identifiers["regulatoryComplexes"]
     mapped_proteins_ids.update(identifiers["products"])
-    
+
     new_proteins_ids = []
-    for protein_id in json_object.get("accessoryProteins",[]):
+    for protein_id in json_object.get("accessoryProteins", []):
         new_proteins_ids.append(mapped_proteins_ids[protein_id])
     if new_proteins_ids != []:
-        json_object["accessoryProteins"]=new_proteins_ids
-    
+        json_object["accessoryProteins"] = new_proteins_ids
+
     # replacing gene_id
     gene = json_object.get("gene", None)
     if gene is not None:
@@ -483,4 +483,55 @@ mg_replace_ids_builder = {
     "transcriptionFactors": transcription_factors,
     "regulatorySites": transcription_factor_regulatory_site,
     "segments": segment
+}
+
+
+def replace_peak_id(json_object, identifiers, collection_name='peaks'):
+    mapped_collection_ids = identifiers[collection_name]
+    source_object_id = json_object["peakId"]
+    json_object["peakId"] = mapped_collection_ids[source_object_id]
+
+
+def replace_dataset_ids(json_object, identifiers):
+    mapped_dataset_ids = identifiers["dataset"]
+    dataset_ids = json_object.get("datasetIds", [])
+    new_dataset_ids = []
+    for dataset_id in dataset_ids:
+        new_dataset_ids.append(mapped_dataset_ids[dataset_id])
+    json_object["datasetIds"] = new_dataset_ids
+
+
+def dataset(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+
+def peaks(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+    # replacing dataset_ids
+    replace_dataset_ids(json_object, identifiers)
+
+
+def tfBinding(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+    # replacing dataset_ids
+    replace_dataset_ids(json_object, identifiers)
+
+    # replacing peakId
+    replace_peak_id(json_object, identifiers, 'peaks')
+
+
+def authors_data(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+    # replacing dataset_ids
+    replace_dataset_ids(json_object, identifiers)
+
+
+ht_replace_ids_builder = {
+    "dataset": dataset,
+    "peaks": peaks,
+    "tfBinding": tfBinding,
+    "authorsData": authors_data,
 }
