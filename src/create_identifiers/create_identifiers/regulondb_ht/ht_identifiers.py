@@ -40,7 +40,7 @@ def manage_ids(jsons_data, **metadata_properties):
         # Trying to obtain identifiers from the collection that is been
         # processed, in order to check if the pre-identifier that is been
         # processed is going to be updated or created
-        collection_identifiers = identifiers_api.regulondbmultigenomic.get_identifiers_by(
+        collection_identifiers = identifiers_api.regulondbht.get_identifiers_by(
             type=collection_name, ontology_name=ontology_name, organism=organism)
 
         for json_object in collection_data:

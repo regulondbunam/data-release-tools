@@ -2,6 +2,9 @@ from .domain.dataset import dataset
 from .domain.authorsData import author_data
 from .domain.peaks import peaks
 from .domain.tfBinding import tfBinding
+from .domain.tus import tus
+from .domain.tss import tss
+from .domain.tts import tts
 
 
 def build_identifier_object(object_id, **kwargs):
@@ -31,11 +34,13 @@ get_unique_data = {
     "peaks": peaks,
     "tfBinding": tfBinding,
     "authorsData": author_data,
+    "transcriptionUnit": tus,
+    "transcriptionStartSite": tss,
+    "transcriptionTerminationSite": tts,
 }
 
 
 def set_identifier_object(json_object, collection_name, **metadata_properties):
-    # print(collection_name)
     if collection_name == "segments":
         return None
     metadata_properties["type"] = collection_name

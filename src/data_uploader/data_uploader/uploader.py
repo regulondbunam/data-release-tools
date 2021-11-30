@@ -7,7 +7,7 @@ from pymongo import errors
 class Uploader(object):
     inconsistencies_generated = False
 
-    def __init__(self, connection_url, database="regulondbmultigenomic"):
+    def __init__(self, connection_url, database):
         self.client = MongoClient(connection_url)
         self.db_conn = self.client[database]
 

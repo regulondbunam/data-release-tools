@@ -522,6 +522,27 @@ def tfBinding(json_object, identifiers, collection_name):
     replace_peak_id(json_object, identifiers, 'peaks')
 
 
+def transcription_unit(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+    # replacing dataset_ids
+    replace_dataset_ids(json_object, identifiers)
+
+
+def transcription_start_site(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+    # replacing dataset_ids
+    replace_dataset_ids(json_object, identifiers)
+
+
+def transcription_termination_site(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+    # replacing dataset_ids
+    replace_dataset_ids(json_object, identifiers)
+
+
 def authors_data(json_object, identifiers, collection_name):
     replace_object_main_id(json_object, identifiers, collection_name)
 
@@ -534,4 +555,7 @@ ht_replace_ids_builder = {
     "peaks": peaks,
     "tfBinding": tfBinding,
     "authorsData": authors_data,
+    "transcriptionUnit": transcription_unit,
+    "transcriptionStartSite": transcription_start_site,
+    "transcriptionTerminationSite": transcription_termination_site,
 }

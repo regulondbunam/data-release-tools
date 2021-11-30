@@ -53,7 +53,7 @@ if __name__ == '__main__':
     args = arguments.load()
     log_path = args.log
     mongodb_url = args.url
-    database = "regulondbmultigenomic" if args.regulondbmultigenomic else "regulondbdatamarts"
+    database = args.database
 
     input_path = args.inputdir
     log_path = set_log(log_path)

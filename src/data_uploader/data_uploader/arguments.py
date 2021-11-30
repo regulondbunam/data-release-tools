@@ -28,18 +28,11 @@ def load():
         required=True
     )
 
-    db_group = parser.add_mutually_exclusive_group(required=True)
-
-    db_group.add_argument(
-        "-mg", "--regulondbmultigenomic",
-        action="store_true",
-        help="Sets the process for MultiGenomic DB"
-    )
-
-    db_group.add_argument(
-        "-dm", "--regulondbdatamarts",
-        action="store_true",
-        help="Sets the process for Datamarts DB"
+    parser.add_argument(
+        "-db", "--database",
+        help="MongoDB database",
+        metavar=["regulondbmultigenomic", "regulondbht", "regulondbdatamarts"],
+        required=True
     )
 
     parser.add_argument(
@@ -51,3 +44,22 @@ def load():
 
     arguments = parser.parse_args()
     return arguments
+
+
+'''
+    db_group = parser.add_mutually_exclusive_group(required=True)
+
+    db_group.add_argument(
+        "-mg", "--regulondbmultigenomic",
+        help="Sets the process for MultiGenomic DB",
+    )
+
+    db_group.add_argument(
+        "-dm", "--regulondbdatamarts",
+        help="Sets the process for Datamarts DB",
+    )
+
+    db_group.add_argument(
+        "-ht", "--regulondbht",
+        help="Sets the process for HT DB",
+    )'''
