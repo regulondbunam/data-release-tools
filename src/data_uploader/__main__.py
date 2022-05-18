@@ -43,9 +43,20 @@ def set_log(log_path):
 
 def run(connection_url, database, input_path=None):
     mongodb_connection = Uploader(connection_url, database)
-    json_data = get_data(input_path)
-    for collection_name, json_data in json_data.items():
-        for json_object in json_data:
+    # json_data = get_data(input_path)
+    for filename in os.listdir(input_path):
+        if os.path.isdir(os.path.join(input_path, filename)):
+            continue
+        filename = os.path.join(input_path, filename)
+        json_data = read_json(filename)
+        if json_data:
+            collection_name = json_data["collectionName"]
+            data = json_data["collectionData"]
+        # collection_data.setdefault(collection_name, []).extend(data)
+        # for collection_name, json_data in json_data.items():
+        logging.info(f'Working on collection: {collection_name}')
+        print(f'Working on collection: {collection_name}')
+        for json_object in data:
             mongodb_connection.upload_object(collection_name, json_object)
 
 
@@ -53,9 +64,10 @@ if __name__ == '__main__':
     args = arguments.load()
     log_path = args.log
     mongodb_url = args.url
-    database = "regulondbmultigenomic" if args.regulondbmultigenomic else "regulondbdatamarts"
+    database = args.database
 
     input_path = args.inputdir
     log_path = set_log(log_path)
     run(mongodb_url, database, input_path)
     print("Process finished, check: {}, for more info".format(log_path))
+    print('end')
