@@ -5,6 +5,8 @@ from .domain.tfBinding import tfBinding
 from .domain.tus import tus
 from .domain.tss import tss
 from .domain.tts import tts
+from .domain.gex import gex
+from .domain.nlp_gc import nlp_gc
 
 
 def build_identifier_object(object_id, **kwargs):
@@ -37,6 +39,8 @@ get_unique_data = {
     "transcriptionUnit": tus,
     "transcriptionStartSite": tss,
     "transcriptionTerminationSite": tts,
+    "geneExpression": gex,
+    "nlpGrowthConditions": nlp_gc,
 }
 
 

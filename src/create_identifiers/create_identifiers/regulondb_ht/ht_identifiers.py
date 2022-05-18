@@ -16,34 +16,35 @@ def handle_id(identifier_object, collection_registered_identifiers):
             identifiers_api.create_id(identifier_object)
 
 
-def manage_ids(jsons_data, **metadata_properties):
+def manage_ids(json_data, **metadata_properties):
     """
 
-    :param jsons_data:
+    :param json_data:
     :param kwargs:
     :return:
     """
 
     organism = metadata_properties.get("organism", None)
 
-    for dataset in jsons_data:
-        collection_name = dataset.get("collectionName", None)
-        collection_data = dataset.get("collectionData", None)
-        ontology_name = dataset.get("ontologyName", None)
+    # for json_data in json_data:
+    collection_name = json_data.get("collectionName", None)
+    print(collection_name)
+    collection_data = json_data.get("collectionData", None)
+    ontology_name = json_data.get("ontologyName", None)
 
-        metadata_properties["classAcronym"] = dataset.get("classAcronym", None)
-        metadata_properties["childClassAcronym"] = dataset.get("childClassAcronym")
-        metadata_properties["subClassAcronym"] = dataset.get(
-            "subClassAcronym", None)
-        metadata_properties["ontologyName"] = ontology_name
+    metadata_properties["classAcronym"] = json_data.get("classAcronym", None)
+    metadata_properties["childClassAcronym"] = json_data.get("childClassAcronym")
+    metadata_properties["subClassAcronym"] = json_data.get(
+        "subClassAcronym", None)
+    metadata_properties["ontologyName"] = ontology_name
 
-        # Trying to obtain identifiers from the collection that is been
-        # processed, in order to check if the pre-identifier that is been
-        # processed is going to be updated or created
-        collection_identifiers = identifiers_api.regulondbht.get_identifiers_by(
-            type=collection_name, ontology_name=ontology_name, organism=organism)
+    # Trying to obtain identifiers from the collection that is been
+    # processed, in order to check if the pre-identifier that is been
+    # processed is going to be updated or created
+    collection_identifiers = identifiers_api.regulondbht.get_identifiers_by(
+        type=collection_name, ontology_name=ontology_name, organism=organism)
 
-        for json_object in collection_data:
-            identifier_object = set_identifier_object(
-                json_object, collection_name, **metadata_properties)
-            handle_id(identifier_object, collection_identifiers)
+    for json_object in collection_data:
+        identifier_object = set_identifier_object(
+            json_object, collection_name, **metadata_properties)
+        handle_id(identifier_object, collection_identifiers)

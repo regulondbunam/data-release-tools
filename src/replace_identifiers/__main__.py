@@ -39,22 +39,23 @@ def replace_mg_identifiers(jsons_data, regulondb_version, organism, output_path=
         create_json(filename, collection_name, collection_data, output_path)
 
 
-def replace_ht_identifiers(jsons_data, regulondb_version, organism, output_path=None):
+def replace_ht_identifiers(json_data, filename, regulondb_version, organism, output_path=None):
     htdb_identifiers = identifiers_api.regulondbht.get_all_identifiers(
         regulondb_version, organism)
-    for filename, dataset in jsons_data.items():
-        collection_name = dataset.get("collectionName")
-        collection_data = dataset.get("collectionData")
+    # for filename, dataset in json_data.items():
+    collection_name = json_data.get("collectionName")
+    print(collection_name, filename)
+    collection_data = json_data.get("collectionData")
 
-        if collection_name not in ht_replace_ids_builder:
-            raise NotImplementedError(
-                "There's currently no identifier process for the {} collection.\n\t Skipping this collection data".format(collection_name))
+    if collection_name not in ht_replace_ids_builder:
+        raise NotImplementedError(
+            "There's currently no identifier process for the {} collection.\n\t Skipping this collection data".format(collection_name))
 
-        for json_object in collection_data:
-            ht_replace_ids_builder[collection_name](
-                json_object, htdb_identifiers, collection_name)
+    for json_object in collection_data:
+        ht_replace_ids_builder[collection_name](
+            json_object, htdb_identifiers, collection_name)
 
-        create_json(filename, collection_name, collection_data, output_path)
+    create_json(filename, collection_name, collection_data, output_path)
 
 
 def set_log(log_path):
@@ -67,19 +68,28 @@ def set_log(log_path):
 
 def run(regulondb_version, organism, input_path, output_path, database):
     utils.verify_paths([input_path, output_path])
-    input_files = utils.load_files(input_path)
-    if database == 'regulondbmultigenomic':
-        replace_mg_identifiers(
-            input_files, regulondb_version, organism, output_path)
-    elif database == "regulondbht":
-        replace_ht_identifiers(
-            input_files, regulondb_version, organism, output_path)
-    elif database == "regulondbdatamarts":
-        pass
-    else:
-        raise KeyError("Process of creating identifiers for the selected "
-                       f"database({database}) has not been implemented or "
-                       f"there's a typo, please verify it before continuing")
+    # input_files = utils.load_files(input_path)
+    for filename in os.listdir(input_path):
+        if os.path.isdir(os.path.join(input_path, filename)):
+            continue
+        with open(os.path.join(input_path, filename), 'r') as fp:
+            try:
+                json_data = json.loads(fp.read())
+            except ValueError as value_error:
+                print("{} is not a valid json file. File is being ignored.".format(filename))
+                continue
+        if database == 'regulondbmultigenomic':
+            replace_mg_identifiers(
+                json_data, regulondb_version, organism, output_path)
+        elif database == "regulondbht":
+            replace_ht_identifiers(
+                json_data, filename, regulondb_version, organism, output_path)
+        elif database == "regulondbdatamarts":
+            pass
+        else:
+            raise KeyError("Process of creating identifiers for the selected "
+                           f"database({database}) has not been implemented or "
+                           f"there's a typo, please verify it before continuing")
 
 
 if __name__ == '__main__':

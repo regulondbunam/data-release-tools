@@ -501,6 +501,15 @@ def replace_dataset_ids(json_object, identifiers):
     json_object["datasetIds"] = new_dataset_ids
 
 
+def replace_sites_ids(json_object, identifiers):
+    mapped_dataset_ids = identifiers["tfBinding"]
+    site_ids = json_object.get("siteIds", [])
+    new_site_ids = []
+    for dataset_id in site_ids:
+        new_site_ids.append(mapped_dataset_ids[dataset_id])
+    json_object["siteIds"] = new_site_ids
+
+
 def dataset(json_object, identifiers, collection_name):
     replace_object_main_id(json_object, identifiers, collection_name)
 
@@ -511,6 +520,9 @@ def peaks(json_object, identifiers, collection_name):
     # replacing dataset_ids
     replace_dataset_ids(json_object, identifiers)
 
+    # replacing site_ids
+    replace_sites_ids(json_object, identifiers)
+
 
 def tfBinding(json_object, identifiers, collection_name):
     replace_object_main_id(json_object, identifiers, collection_name)
@@ -520,6 +532,20 @@ def tfBinding(json_object, identifiers, collection_name):
 
     # replacing peakId
     replace_peak_id(json_object, identifiers, 'peaks')
+
+
+def gene_expression(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+    # replacing dataset_ids
+    replace_dataset_ids(json_object, identifiers)
+
+
+def nlp_gc(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+    # replacing dataset_ids
+    replace_dataset_ids(json_object, identifiers)
 
 
 def transcription_unit(json_object, identifiers, collection_name):
@@ -558,4 +584,6 @@ ht_replace_ids_builder = {
     "transcriptionUnit": transcription_unit,
     "transcriptionStartSite": transcription_start_site,
     "transcriptionTerminationSite": transcription_termination_site,
+    "geneExpression": gene_expression,
+    "nlpGrowthConditions": nlp_gc,
 }

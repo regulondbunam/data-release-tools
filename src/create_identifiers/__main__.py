@@ -1,4 +1,5 @@
 import os
+import json
 
 import identifiers_api
 
@@ -17,19 +18,30 @@ def run(input_path, **kwargs):
     :return:
     """
     utils.verify_paths(input_path)
-    jsons_data = utils.load_files(input_path)
-    database = kwargs.get("database", None)
-
-    if database == "regulondbmultigenomic":
-        multigenomic_identifiers.manage_ids(jsons_data, **kwargs)
-    elif database == "regulondbht":
-        ht_identifiers.manage_ids(jsons_data, **kwargs)
-    elif database == "regulondbdatamarts":
-        pass
-    else:
-        raise KeyError("Process of creating identifiers for the selected "
-                       f"database({database}) has not been implemented or "
-                       f"there's a typo, please verify it before continuing")
+    # jsons_data = utils.load_files(input_path)
+    for filename in os.listdir(input_path):
+        if os.path.isdir(os.path.join(input_path, filename)):
+            continue
+        with open(os.path.join(input_path, filename), 'r') as fp:
+            try:
+                json_data = json.loads(fp.read())
+            except ValueError as value_error:
+                print(
+                    "{} is not a valid json file. File is being ignored.".format(
+                        filename))
+                continue
+        database = kwargs.get("database", None)
+        if database == "regulondbmultigenomic":
+            multigenomic_identifiers.manage_ids(json_data, **kwargs)
+        elif database == "regulondbht":
+            print(filename)
+            ht_identifiers.manage_ids(json_data, **kwargs)
+        elif database == "regulondbdatamarts":
+            pass
+        else:
+            raise KeyError("Process of creating identifiers for the selected "
+                           f"database({database}) has not been implemented or "
+                           f"there's a typo, please verify it before continuing")
 
 
 if __name__ == "__main__":
