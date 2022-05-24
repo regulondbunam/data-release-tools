@@ -21,22 +21,23 @@ def create_json(filename, collection_name, collection_data, output_path):
         json.dump(output_file, json_file, indent=2, sort_keys=True)
 
 
-def replace_mg_identifiers(jsons_data, regulondb_version, organism, output_path=None):
+def replace_mg_identifiers(jsons_data, filename, regulondb_version, organism, output_path=None):
     multigenomicdb_identifiers = identifiers_api.regulondbmultigenomic.get_all_identifiers(
         regulondb_version, organism)
-    for filename, dataset in jsons_data.items():
-        collection_name = dataset.get("collectionName")
-        collection_data = dataset.get("collectionData")
+    # for filename, dataset in jsons_data.items():
+    collection_name = jsons_data.get("collectionName")
+    print(collection_name, filename)
+    collection_data = jsons_data.get("collectionData")
 
-        if collection_name not in mg_replace_ids_builder:
-            raise NotImplementedError(
-                "There's currently no identifier process for the {} collection.\n\t Skipping this collection data".format(collection_name))
+    if collection_name not in mg_replace_ids_builder:
+        raise NotImplementedError(
+            "There's currently no identifier process for the {} collection.\n\t Skipping this collection data".format(collection_name))
 
-        for json_object in collection_data:
-            mg_replace_ids_builder[collection_name](
-                json_object, multigenomicdb_identifiers, collection_name)
+    for json_object in collection_data:
+        mg_replace_ids_builder[collection_name](
+            json_object, multigenomicdb_identifiers, collection_name)
 
-        create_json(filename, collection_name, collection_data, output_path)
+    create_json(filename, collection_name, collection_data, output_path)
 
 
 def replace_ht_identifiers(json_data, filename, regulondb_version, organism, output_path=None):
@@ -76,11 +77,12 @@ def run(regulondb_version, organism, input_path, output_path, database):
             try:
                 json_data = json.loads(fp.read())
             except ValueError as value_error:
-                print("{} is not a valid json file. File is being ignored.".format(filename))
+                print(
+                    "{} is not a valid json file. File is being ignored.".format(filename))
                 continue
         if database == 'regulondbmultigenomic':
             replace_mg_identifiers(
-                json_data, regulondb_version, organism, output_path)
+                json_data, filename, regulondb_version, organism, output_path)
         elif database == "regulondbht":
             replace_ht_identifiers(
                 json_data, filename, regulondb_version, organism, output_path)

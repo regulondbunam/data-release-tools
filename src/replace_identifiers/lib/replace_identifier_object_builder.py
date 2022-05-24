@@ -1,4 +1,4 @@
-def replace_citations_ids(json_object, identifiers):
+def replace_citations_ids(obj_id, json_object, identifiers):
     citations = json_object.get("citations", [])
     mapped_evidence_ids = identifiers["evidences"]
     mapped_publication_ids = identifiers["publications"]
@@ -6,16 +6,29 @@ def replace_citations_ids(json_object, identifiers):
         source_evidence_id = citation.get("evidences_id", None)
         source_publication_id = citation.get("publications_id", None)
         if source_evidence_id:
+            if '|' not in source_evidence_id:
+                # print(f'{obj_id}: ev_id: {source_evidence_id}')
+                source_evidence_id = f'|{source_evidence_id}|'
             citation["evidences_id"] = mapped_evidence_ids[source_evidence_id]
         if source_publication_id:
+            if '|' not in source_publication_id:
+                # print(f'{obj_id}: pub_id: {source_publication_id}')
+                source_publication_id = f'|{source_publication_id}|'
             citation["publications_id"] = mapped_publication_ids[source_publication_id]
 
 
 def replace_external_cross_references_ids(json_object, identifiers):
     external_cross_references = json_object.get("externalCrossReferences", [])
     mapped_external_cross_reference_ids = identifiers["externalCrossReferences"]
+    # print(mapped_external_cross_reference_ids)
+    # print(external_cross_references)
+    # if external_cross_references:
     for external_cross_reference in external_cross_references:
-        source_external_cross_reference_id = external_cross_reference["externalCrossReferences_id"]
+        source_external_cross_reference_id = external_cross_reference[
+            "externalCrossReferences_id"]
+        if '|' not in source_external_cross_reference_id:
+            # print(f'{json_object["_id"]}: exRef_id: {source_external_cross_reference_id}')
+            source_external_cross_reference_id = f'|{source_external_cross_reference_id}|'
         external_cross_reference["externalCrossReferences_id"] = mapped_external_cross_reference_ids[source_external_cross_reference_id]
 
 
@@ -51,6 +64,7 @@ def external_cross_references(json_object, identifiers, collection_name):
 
 
 def gene(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing term_ids
@@ -66,7 +80,7 @@ def gene(json_object, identifiers, collection_name):
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
     # replacing organism_id
     replace_organism_id(json_object)
@@ -115,6 +129,8 @@ def operon(json_object, identifiers, collection_name):
 
 
 def product(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
+    # print(source_origin_id)
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing gene_id
@@ -128,34 +144,36 @@ def product(json_object, identifiers, collection_name):
     for term_component in product_terms.get("biologicalProcess", []):
         source_term_id = term_component["terms_id"]
         term_component["terms_id"] = mapped_term_ids[source_term_id]
-        replace_citations_ids(term_component, identifiers)
+        replace_citations_ids(source_origin_id, term_component, identifiers)
     for term_component in product_terms.get("cellularComponent", []):
         source_term_id = term_component["terms_id"]
         term_component["terms_id"] = mapped_term_ids[source_term_id]
-        replace_citations_ids(term_component, identifiers)
+        replace_citations_ids(source_origin_id, term_component, identifiers)
     for term_component in product_terms.get("molecularFunction", []):
         source_term_id = term_component["terms_id"]
         term_component["terms_id"] = mapped_term_ids[source_term_id]
-        replace_citations_ids(term_component, identifiers)
+        replace_citations_ids(source_origin_id, term_component, identifiers)
 
     # replacing external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(json_object["_id"], json_object, identifiers)
 
     # replacing organism_id
     replace_organism_id(json_object)
 
 
 def promoter(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
+    # print(source_origin_id)
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
     '''
     # replacing promoter_feature_ids
     mapped_promoter_feature_ids = identifiers["promoterFeature"]
@@ -163,12 +181,13 @@ def promoter(json_object, identifiers, collection_name):
         source_promoter_feature_id = promoter_feature["promoterFeature_id"]
         promoter_feature["promoterFeature_id"] = mapped_promoter_feature_ids[source_promoter_feature_id]
         # replacing promoter feature citation_ids
-        replace_citations_ids(promoter_feature, identifiers)
+        replace_citations_ids(json_object["_id"],promoter_feature, identifiers)
 
         # replacing bindsSigmaFactor citation_ids
         binds_sigma_factor = promoter_feature.get("bindsSigmaFactor", None)
         if binds_sigma_factor is not None:
-            replace_citations_ids(binds_sigma_factor, identifiers)
+            replace_citations_ids(
+                json_object["_id"],binds_sigma_factor, identifiers)
     '''
     # replacing sigma_factor_id
     source_sigma_factor_id = json_object.get(
@@ -183,10 +202,18 @@ def promoter(json_object, identifiers, collection_name):
         mapped_evidences_ids = identifiers["evidences"]
         mapped_publications_ids = identifiers["publications"]
         for citation in source_citations:
-            if citation.get("evidences_id") is not None:
-                citation["evidences_id"] = mapped_evidences_ids[citation["evidences_id"]]
-            if citation.get("publications_id") is not None:
-                citation["publications_id"] = mapped_publications_ids[citation["publications_id"]]
+            source_evidence_id = citation.get("evidences_id", None)
+            source_publication_id = citation.get("publications_id", None)
+            if source_evidence_id:
+                if '|' not in source_evidence_id:
+                    # print(f'{json_object["_id"]}: ev_id: {source_evidence_id}')
+                    source_evidence_id = f'|{source_evidence_id}|'
+                citation["evidences_id"] = mapped_evidences_ids[source_evidence_id]
+            if source_publication_id:
+                if '|' not in source_publication_id:
+                    # print(f'{json_object["_id"]}: pub_id: {source_publication_id}')
+                    source_publication_id = f'|{source_publication_id}|'
+                citation["publications_id"] = mapped_publications_ids[source_publication_id]
 
     # replacing organism_id
     replace_organism_id(json_object)
@@ -203,13 +230,14 @@ def publication(json_object, identifiers, collection_name):
 
 
 def regulatory_complex(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
     # replacing product ids
     mapped_product_ids = identifiers["products"]
@@ -227,26 +255,29 @@ def regulatory_complex(json_object, identifiers, collection_name):
 
 
 def regulatory_continuant(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
+    # print(source_origin_id)
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
     # replacing organism_id
     replace_organism_id(json_object)
 
 
 def regulatory_interaction(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
     # replacing accessoryProteins
     mapped_proteins_ids = identifiers["regulatoryComplexes"]
@@ -309,13 +340,14 @@ def regulatory_interaction(json_object, identifiers, collection_name):
 
 
 def sigma_factor(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
     # replacing gene ids
     mapped_gene_ids = identifiers["genes"]
@@ -327,13 +359,14 @@ def sigma_factor(json_object, identifiers, collection_name):
 
 
 def term(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
     # replacing isA(parent terms) ids
     mapped_term_ids = identifiers["terms"]
@@ -365,26 +398,28 @@ def term(json_object, identifiers, collection_name):
 
 
 def terminator(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
     # replacing organism_id
     replace_organism_id(json_object)
 
 
 def transcription_unit(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     replace_object_main_id(json_object, identifiers, collection_name)
 
     # replacing external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
 
     # replacing citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
     # replacing gene ids
     mapped_gene_ids = identifiers["genes"]
@@ -412,6 +447,7 @@ def transcription_unit(json_object, identifiers, collection_name):
 
 
 def transcription_factors(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     # replacing transcriptionFactorRegulatorySite_id
     mapped_site_identifiers = identifiers[collection_name]
     source_site_id = json_object.get("_id", None)
@@ -419,7 +455,7 @@ def transcription_factors(json_object, identifiers, collection_name):
     # replacing site's external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
     # replacing site's citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
     # replacing active conformations
     mapped_product_ids = identifiers["products"]
@@ -444,6 +480,7 @@ def transcription_factors(json_object, identifiers, collection_name):
 
 
 def transcription_factor_regulatory_site(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     # replacing transcriptionFactorRegulatorySite_id
     mapped_site_identifiers = identifiers[collection_name]
     source_site_id = json_object.get("_id", None)
@@ -451,16 +488,17 @@ def transcription_factor_regulatory_site(json_object, identifiers, collection_na
     # replacing site's external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
     # replacing site's citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
     # replacing organism_id
     replace_organism_id(json_object)
 
 
 def segment(json_object, identifiers, collection_name):
+    source_origin_id = json_object["_id"]
     # replacing site's external_cross_reference_ids
     replace_external_cross_references_ids(json_object, identifiers)
     # replacing site's citation_ids
-    replace_citations_ids(json_object, identifiers)
+    replace_citations_ids(source_origin_id, json_object, identifiers)
 
 
 mg_replace_ids_builder = {
@@ -483,6 +521,8 @@ mg_replace_ids_builder = {
     "transcriptionFactors": transcription_factors,
     "regulatorySites": transcription_factor_regulatory_site,
     "segments": segment
+
+
 }
 
 
