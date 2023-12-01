@@ -4,7 +4,8 @@ import jsonschema
 
 
 def remove_id_pattern_from_schema(schema):
-    schema = delete_keys_from_dict(schema, ["pattern"], "^RDB[A-Z]{8}[0-9]{5}$")
+    schema = delete_keys_from_dict(
+        schema, ["pattern"], "^RDB[A-Z]{8}[0-9]{5}$")
     return schema
 
 
@@ -13,21 +14,23 @@ def delete_keys_from_dict(dictionary_to_update, keys_to_remove, value):
     Delete the keys presented in the keys_to_remove from the dictionary_to_update.
     Loops recursively over nested dictionaries.
     """
+    new_dictionary_to_update = dictionary_to_update.copy()
     if type(keys_to_remove) is not set:
         keys_to_remove = set(keys_to_remove)
     for k, v in dictionary_to_update.items():
         if k in keys_to_remove:
             if dictionary_to_update[k] == value:
-                del dictionary_to_update[k]
+                new_dictionary_to_update.pop(k)
         if isinstance(v, dict):
-            delete_keys_from_dict(v, keys_to_remove, value)
-    return dictionary_to_update
+            new_dictionary_to_update[k] = delete_keys_from_dict(
+                new_dictionary_to_update[k], keys_to_remove, value)
+    return new_dictionary_to_update
 
 
 def verify_paths(data_path):
     for path_name, path in data_path.items():
         if not os.path.exists(path):
-            raise IOError("Please, verify '{}' directory path".format(path_name))
+            raise IOError(f"Please, verify '{path_name}' directory path")
 
 
 def _load_files(file_path):
@@ -38,7 +41,7 @@ def _load_files(file_path):
             try:
                 json_data = json.loads(fp.read())
             except ValueError as value_error:
-                print "{} is not a valid json file. File is being ignored.".format(filename)
+                print(f"{filename} is not a valid json file. File is being ignored.")
                 continue
         yield filename, json_data
 
@@ -47,10 +50,13 @@ def load_schemas(file_path, remove_id_pattern):
     files = {}
     json_schemas = _load_files(file_path)
     for filename, json_schema in json_schemas:
-        if remove_id_pattern is True:
-            json_schema = remove_id_pattern_from_schema(json_schema)
-        for collection_name, values in json_schema.items():
-            files[collection_name] = values
+        if remove_id_pattern:
+            new_json_schema = remove_id_pattern_from_schema(json_schema)
+            for collection_name, values in new_json_schema.items():
+                files[collection_name] = values
+        else:
+            for collection_name, values in json_schema.items():
+                files[collection_name] = values
     return files
 
 
@@ -62,7 +68,7 @@ def load_jsons(file_path):
     return files
 
 
-#TODO: Implementar logica para atrapar todos los errores de un json
+# TODO: Implementar logica para atrapar todos los errores de un json
 def validate_data(collection_schema, filename, json_data, valid_data_path, invalid_data_path, error_log_path):
     valid_data = []
     invalid_data = []
@@ -72,11 +78,12 @@ def validate_data(collection_schema, filename, json_data, valid_data_path, inval
     for current_object in collection_data:
         try:
             jsonschema.validate(instance=current_object, schema=collection_schema["validator"]["$jsonSchema"],
-                                   format_checker=jsonschema.draft4_format_checker)
+                                format_checker=jsonschema.draft4_format_checker)
             valid_data.append(current_object.copy())
         except jsonschema.exceptions.ValidationError as validation_error:
             invalid_data.append(current_object.copy())
-            error_log.append([current_object["_id"], validation_error.message, [element for element in validation_error.path]])
+            error_log.append([current_object["_id"], validation_error.message, [
+                             element for element in validation_error.path]])
 
     if valid_data:
         json_data["collectionData"] = valid_data
@@ -84,9 +91,9 @@ def validate_data(collection_schema, filename, json_data, valid_data_path, inval
     if invalid_data:
         json_data["collectionData"] = invalid_data
         create_json(json_data, os.path.join(invalid_data_path, filename))
-        print "\tInconsistencies found on {}".format(collection_name)
+        print(f"\tInconsistencies found on {collection_name}")
     else:
-        print "\tNo inconsistencies found on {}".format(filename)
+        print(f"\tNo inconsistencies found on {filename}")
 
     if error_log:
         create_json(error_log, os.path.join(error_log_path, filename))
