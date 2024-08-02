@@ -20,6 +20,14 @@ class Uploader(object):
                 Uploader.inconsistencies_generated = True
 
             except errors.DuplicateKeyError as duplicate_key_error:
+                '''
+                pint(json_object)
+                collection.update_one( 
+                    {
+                        "_id": json_object["_id"]
+                    }
+                )
+                '''
                 logging.error('Working on collection: {}; object: {} duplicate key error'.format(collection_name, json_object["_id"]))
                 Uploader.inconsistencies_generated = True
 
