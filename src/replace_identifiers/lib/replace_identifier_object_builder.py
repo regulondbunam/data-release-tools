@@ -627,3 +627,12 @@ ht_replace_ids_builder = {
     "geneExpression": gene_expression,
     "nlpGrowthConditions": nlp_gc,
 }
+
+
+def growth_condition(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+
+dm_replace_ids_builder = {
+    "growthCondition": growth_condition
+}

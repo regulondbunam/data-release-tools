@@ -44,7 +44,7 @@ def load_arguments():
 
     parser.add_argument(
         "-db", "--database",
-        choices=["regulondbmultigenomic", "regulondbht"],
+        choices=["regulondbmultigenomic", "regulondbht", "regulondbdatamarts"],
         help="database where the input data belongs",
         metavar="regulondbmultigenomic",
         required=True

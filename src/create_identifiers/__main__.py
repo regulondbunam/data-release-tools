@@ -8,7 +8,7 @@ from create_identifiers.lib import arguments
 
 from create_identifiers.regulondb_multigenomic import multigenomic_identifiers
 from create_identifiers.regulondb_ht import ht_identifiers
-
+from create_identifiers.regulondb_datamarts import datamarts_identifiers
 
 def run(input_path, **kwargs):
     """
@@ -37,7 +37,8 @@ def run(input_path, **kwargs):
             print(filename)
             ht_identifiers.manage_ids(json_data, **kwargs)
         elif database == "regulondbdatamarts":
-            pass
+            print(filename)
+            datamarts_identifiers.manage_ids(json_data, **kwargs)
         else:
             raise KeyError("Process of creating identifiers for the selected "
                            f"database({database}) has not been implemented or "

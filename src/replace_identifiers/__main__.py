@@ -6,7 +6,7 @@ import identifiers_api
 
 from lib import utils
 from lib import arguments
-from lib.replace_identifier_object_builder import mg_replace_ids_builder, ht_replace_ids_builder
+from lib.replace_identifier_object_builder import mg_replace_ids_builder, ht_replace_ids_builder, dm_replace_ids_builder
 
 
 def create_json(filename, collection_name, collection_data, output_path):

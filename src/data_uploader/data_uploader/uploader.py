@@ -21,6 +21,8 @@ class Uploader(object):
 
             except errors.DuplicateKeyError as duplicate_key_error:
                 '''
+                # Future programer this will update the collection while uploading
+                # but in this moment we reset all collections before uploading
                 pint(json_object)
                 collection.update_one( 
                     {

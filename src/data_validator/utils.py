@@ -6,6 +6,8 @@ import jsonschema
 def remove_id_pattern_from_schema(schema):
     schema = delete_keys_from_dict(
         schema, ["pattern"], "^RDB[A-Z]{8}[0-9]{5}$")
+    schema = delete_keys_from_dict(
+        schema, ["pattern"], "^RDM[A-Z]{8}[0-9]{5}$")
     return schema
 
 
