@@ -58,6 +58,24 @@ def replace_ht_identifiers(json_data, filename, regulondb_version, organism, out
 
     create_json(filename, collection_name, collection_data, output_path)
 
+def replace_datamarts_identifiers(json_data, filename, regulondb_version, organism, output_path=None):
+    dmdb_identifiers = identifiers_api.regulondbdatamarts.get_all_identifiers(
+        regulondb_version, organism)
+    # for filename, dataset in json_data.items():
+    collection_name = json_data.get("collectionName")
+    print(collection_name, filename)
+    collection_data = json_data.get("collectionData")
+
+    if collection_name not in dm_replace_ids_builder:
+        raise NotImplementedError(
+            "There's currently no identifier process for the {} collection.\n\t Skipping this collection data".format(collection_name))
+
+    for json_object in collection_data:
+        dm_replace_ids_builder[collection_name](
+            json_object, dmdb_identifiers, collection_name)
+
+    create_json(filename, collection_name, collection_data, output_path)
+
 
 def set_log(log_path):
     if not os.path.isdir(log_path):
@@ -87,7 +105,8 @@ def run(regulondb_version, organism, input_path, output_path, database):
             replace_ht_identifiers(
                 json_data, filename, regulondb_version, organism, output_path)
         elif database == "regulondbdatamarts":
-            pass
+            replace_datamarts_identifiers(
+                json_data, filename, regulondb_version, organism, output_path)
         else:
             raise KeyError("Process of creating identifiers for the selected "
                            f"database({database}) has not been implemented or "
