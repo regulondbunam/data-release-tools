@@ -28,7 +28,6 @@ def manage_ids(jsons_data, **metadata_properties):
     organism = metadata_properties.get("organism", None)
     # for dataset in jsons_data:
     collection_name = jsons_data.get("collectionName", None)
-    print(collection_name)
     collection_data = jsons_data.get("collectionData", None)
     ontology_name = jsons_data.get("ontologyName", None)
 

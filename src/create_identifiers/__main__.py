@@ -36,10 +36,8 @@ def run(input_path, **kwargs):
             multigenomic_identifiers.manage_ids(json_data, **kwargs)
 
         elif database == "regulondbht":
-            print(filename)
             ht_identifiers.manage_ids(json_data, **kwargs)
         elif database == "regulondbdatamarts":
-            print(filename)
             datamarts_identifiers.manage_ids(json_data, **kwargs)
         else:
             raise KeyError("Process of creating identifiers for the selected "
