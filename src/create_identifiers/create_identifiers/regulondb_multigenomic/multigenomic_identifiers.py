@@ -55,4 +55,4 @@ def manage_ids(jsons_data, **metadata_properties):
             total=total_objects,
             collection_name=collection_name
         )
-    print("\n")
+    print(f"{collection_name} done.")
