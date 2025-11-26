@@ -1,6 +1,7 @@
 import json
 import os
 import jsonschema
+import sys
 
 
 def remove_id_pattern_from_schema(schema):
@@ -70,6 +71,32 @@ def load_jsons(file_path):
     return files
 
 
+def print_progress(current, total, collection_name, bar_length=40):
+    """
+    Displays a real-time progress bar in the console, updating on the same line.
+
+    This function calculates the completion fraction, generates a visual progress
+    bar using block characters, and outputs the progress percentage and current
+    count relative to the total.
+
+    Args:
+        current (int): The number of items currently processed.
+        total (int): The total number of items to be processed.
+        collection_name (str): The name of the collection or process being tracked.
+        bar_length (int, optional): The fixed length of the progress bar display.
+                                    Defaults to 40.
+
+    Returns:
+        None: The function only performs output to stdout.
+    """
+    fraction = current / total if total else 1
+    filled = int(bar_length * fraction)
+    bar = "█" * filled + "-" * (bar_length - filled)
+    percent = int(fraction * 100)
+    sys.stdout.write(f"\rProcessing {collection_name}: |{bar}| {percent}% ({current}/{total})")
+    sys.stdout.flush()
+
+
 # TODO: Implementar logica para atrapar todos los errores de un json
 def validate_data(collection_schema, filename, json_data, valid_data_path, invalid_data_path, error_log_path):
     valid_data = []
@@ -77,11 +104,19 @@ def validate_data(collection_schema, filename, json_data, valid_data_path, inval
     error_log = []
     collection_data = json_data["collectionData"]
     collection_name = json_data["collectionName"]
+    total_objects = len(list(collection_data))
+    processed = 0
     for current_object in collection_data:
         try:
             jsonschema.validate(instance=current_object, schema=collection_schema["validator"]["$jsonSchema"],
                                 format_checker=jsonschema.draft4_format_checker)
             valid_data.append(current_object.copy())
+            processed += 1
+            print_progress(
+                current=processed,
+                total=total_objects,
+                collection_name=collection_name
+            )
         except jsonschema.exceptions.ValidationError as validation_error:
             invalid_data.append(current_object.copy())
             error_log.append([current_object["_id"], validation_error.message, [
