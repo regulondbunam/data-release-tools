@@ -1,6 +1,7 @@
 import json
 import os
 import logging
+import sys
 
 
 def set_log(log_path):
@@ -72,3 +73,29 @@ def verify_reference_collections(collection_names):
     for reference_collection_name in reference_collections:
         if reference_collection_name not in collection_names:
             yield reference_collection_name
+
+
+def print_progress(current, total, collection_name, bar_length=40):
+    """
+    Displays a real-time progress bar in the console, updating on the same line.
+
+    This function calculates the completion fraction, generates a visual progress
+    bar using block characters, and outputs the progress percentage and current
+    count relative to the total.
+
+    Args:
+        current (int): The number of items currently processed.
+        total (int): The total number of items to be processed.
+        collection_name (str): The name of the collection or process being tracked.
+        bar_length (int, optional): The fixed length of the progress bar display.
+                                    Defaults to 40.
+
+    Returns:
+        None: The function only performs output to stdout.
+    """
+    fraction = current / total if total else 1
+    filled = int(bar_length * fraction)
+    bar = "█" * filled + "-" * (bar_length - filled)
+    percent = int(fraction * 100)
+    sys.stdout.write(f"\rGenerating IDs {collection_name}: |{bar}| {percent}% ({current}/{total})")
+    sys.stdout.flush()

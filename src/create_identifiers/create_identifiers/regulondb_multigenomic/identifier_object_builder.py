@@ -4,6 +4,7 @@ from .domain.external_cross_reference import external_cross_reference
 from .domain.gene import gene
 from .domain.motif import motif
 from .domain.ontology import ontology
+from .domain.organism import organism
 from .domain.operon import operon
 from .domain.product import product
 from .domain.promoter import promoter
@@ -46,6 +47,7 @@ get_unique_data = {
     "genes": gene,
     "motifs": motif,
     "ontologies": ontology,
+    "organisms": organism,
     "operons": operon,
     "products": product,
     "promoters": promoter,

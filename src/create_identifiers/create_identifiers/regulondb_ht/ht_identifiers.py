@@ -1,6 +1,7 @@
 import identifiers_api
 
 from .identifier_object_builder import set_identifier_object
+from ..lib.utils import print_progress
 
 
 def handle_id(identifier_object, collection_registered_identifiers):
@@ -44,7 +45,15 @@ def manage_ids(json_data, **metadata_properties):
     collection_identifiers = identifiers_api.regulondbht.get_identifiers_by(
         type=collection_name, ontology_name=ontology_name, organism=organism)
 
+    total_objects = len(list(collection_data))
+    processed = 0
     for json_object in collection_data:
         identifier_object = set_identifier_object(
             json_object, collection_name, **metadata_properties)
         handle_id(identifier_object, collection_identifiers)
+        processed += 1
+        print_progress(
+            current=processed,
+            total=total_objects,
+            collection_name=collection_name
+        )

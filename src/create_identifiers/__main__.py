@@ -10,6 +10,7 @@ from create_identifiers.regulondb_multigenomic import multigenomic_identifiers
 from create_identifiers.regulondb_ht import ht_identifiers
 from create_identifiers.regulondb_datamarts import datamarts_identifiers
 
+
 def run(input_path, **kwargs):
     """
 
@@ -19,6 +20,7 @@ def run(input_path, **kwargs):
     """
     utils.verify_paths(input_path)
     # jsons_data = utils.load_files(input_path)
+    print(f"Creating identifiers...")
     for filename in os.listdir(input_path):
         if os.path.isdir(os.path.join(input_path, filename)):
             continue
@@ -26,11 +28,10 @@ def run(input_path, **kwargs):
             try:
                 json_data = json.loads(fp.read())
             except ValueError as value_error:
-                print(
-                    "{} is not a valid json file. File is being ignored.".format(
-                        filename))
+                print(f"{filename} is not a valid json file. File is being ignored.")
                 continue
         database = kwargs.get("database", None)
+        print(f"Preparing IDs generations for {database} collections...")
         if database == "regulondbmultigenomic":
             multigenomic_identifiers.manage_ids(json_data, **kwargs)
         elif database == "regulondbht":
