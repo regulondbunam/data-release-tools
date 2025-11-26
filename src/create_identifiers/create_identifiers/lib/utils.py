@@ -97,5 +97,5 @@ def print_progress(current, total, collection_name, bar_length=40):
     filled = int(bar_length * fraction)
     bar = "█" * filled + "-" * (bar_length - filled)
     percent = int(fraction * 100)
-    sys.stdout.write(f"\rGenerating IDs {collection_name}: |{bar}| {percent}% ({current}/{total})")
+    sys.stdout.write(f"\rGenerating {collection_name} IDs: |{bar}| {percent}% ({current}/{total})")
     sys.stdout.flush()
