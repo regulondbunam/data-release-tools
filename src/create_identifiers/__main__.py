@@ -34,7 +34,6 @@ def run(input_path, **kwargs):
                 continue
         if database == "regulondbmultigenomic":
             multigenomic_identifiers.manage_ids(json_data, **kwargs)
-
         elif database == "regulondbht":
             ht_identifiers.manage_ids(json_data, **kwargs)
         elif database == "regulondbdatamarts":
