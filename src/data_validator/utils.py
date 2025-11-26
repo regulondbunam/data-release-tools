@@ -93,7 +93,7 @@ def print_progress(current, total, collection_name, bar_length=40):
     filled = int(bar_length * fraction)
     bar = "█" * filled + "-" * (bar_length - filled)
     percent = int(fraction * 100)
-    sys.stdout.write(f"\rProcessing {collection_name}: |{bar}| {percent}% ({current}/{total})")
+    sys.stdout.write(f"\rValidating {collection_name}: |{bar}| {percent}% ({current}/{total})")
     sys.stdout.flush()
 
 
@@ -113,19 +113,19 @@ def validate_data(collection_schema, filename, json_data, valid_data_path, inval
             jsonschema.validate(instance=current_object, schema=collection_schema["validator"]["$jsonSchema"],
                                 format_checker=jsonschema.draft4_format_checker)
             valid_data.append(current_object.copy())
-            valid_processed =+ 1
+            valid_processed += 1
         except jsonschema.exceptions.ValidationError as validation_error:
             invalid_data.append(current_object.copy())
             error_log.append([current_object["_id"], validation_error.message, [
                              element for element in validation_error.path]])
-            invalid_processed =+ 1
+            invalid_processed += 1
         processed += 1
         print_progress(
             current=processed,
             total=total_objects,
             collection_name=collection_name
         )
-    print(f"Valid objects: {valid_processed}\tInvalid: {invalid_processed}")
+    print(f"\n\tValid objects: {valid_processed}\tInvalid: {invalid_processed}")
 
     if valid_data:
         json_data["collectionData"] = valid_data
