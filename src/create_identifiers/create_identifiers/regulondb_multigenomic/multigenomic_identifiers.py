@@ -28,6 +28,7 @@ def manage_ids(jsons_data, **metadata_properties):
     organism = metadata_properties.get("organism", None)
     # for dataset in jsons_data:
     collection_name = jsons_data.get("collectionName", None)
+    print(f"Initializing ID generation for: {collection_name}")
     collection_data = jsons_data.get("collectionData", None)
     ontology_name = jsons_data.get("ontologyName", None)
 
@@ -54,3 +55,4 @@ def manage_ids(jsons_data, **metadata_properties):
             total=total_objects,
             collection_name=collection_name
         )
+    print("\n")
