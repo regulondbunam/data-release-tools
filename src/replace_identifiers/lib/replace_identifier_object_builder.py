@@ -111,6 +111,10 @@ def ontology(json_object, identifiers, collection_name):
     replace_external_cross_references_ids(json_object, identifiers)
 
 
+def organism(json_object, identifiers, collection_name):
+    replace_object_main_id(json_object, identifiers, collection_name)
+
+
 def operon(json_object, identifiers, collection_name):
     replace_object_main_id(json_object, identifiers, collection_name)
 
@@ -507,6 +511,7 @@ mg_replace_ids_builder = {
     "genes": gene,
     "motifs": motif,
     "ontologies": ontology,
+    "organisms": organism,
     "operons": operon,
     "products": product,
     "promoters": promoter,
