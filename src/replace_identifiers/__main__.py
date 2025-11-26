@@ -25,9 +25,7 @@ def create_json(filename, collection_name, collection_data, output_path):
 def replace_mg_identifiers(jsons_data, filename, regulondb_version, organism, output_path=None):
     multigenomicdb_identifiers = identifiers_api.regulondbmultigenomic.get_all_identifiers(
         regulondb_version, organism)
-    # for filename, dataset in jsons_data.items():
     collection_name = jsons_data.get("collectionName")
-    print(collection_name, filename)
     collection_data = jsons_data.get("collectionData")
 
     if collection_name not in mg_replace_ids_builder:
@@ -56,7 +54,6 @@ def replace_ht_identifiers(json_data, filename, regulondb_version, organism, out
         regulondb_version, organism)
     # for filename, dataset in json_data.items():
     collection_name = json_data.get("collectionName")
-    print(collection_name, filename)
     collection_data = json_data.get("collectionData")
 
     if collection_name not in ht_replace_ids_builder:
@@ -79,12 +76,12 @@ def replace_ht_identifiers(json_data, filename, regulondb_version, organism, out
     create_json(filename, collection_name, collection_data, output_path)
     print(f"\n{collection_name} done.")
 
+
 def replace_datamarts_identifiers(json_data, filename, regulondb_version, organism, output_path=None):
     dmdb_identifiers = identifiers_api.regulondbdatamarts.get_all_identifiers(
         regulondb_version, organism)
     # for filename, dataset in json_data.items():
     collection_name = json_data.get("collectionName")
-    print(collection_name, filename)
     collection_data = json_data.get("collectionData")
 
     if collection_name not in dm_replace_ids_builder:
