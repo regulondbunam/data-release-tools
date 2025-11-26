@@ -106,21 +106,26 @@ def validate_data(collection_schema, filename, json_data, valid_data_path, inval
     collection_name = json_data["collectionName"]
     total_objects = len(list(collection_data))
     processed = 0
+    valid_processed = 0
+    invalid_processed = 0
     for current_object in collection_data:
         try:
             jsonschema.validate(instance=current_object, schema=collection_schema["validator"]["$jsonSchema"],
                                 format_checker=jsonschema.draft4_format_checker)
             valid_data.append(current_object.copy())
-            processed += 1
-            print_progress(
-                current=processed,
-                total=total_objects,
-                collection_name=collection_name
-            )
+            valid_processed =+ 1
         except jsonschema.exceptions.ValidationError as validation_error:
             invalid_data.append(current_object.copy())
             error_log.append([current_object["_id"], validation_error.message, [
                              element for element in validation_error.path]])
+            invalid_processed =+ 1
+        processed += 1
+        print_progress(
+            current=processed,
+            total=total_objects,
+            collection_name=collection_name
+        )
+    print(f"Valid objects: {valid_processed}\tInvalid: {invalid_processed}")
 
     if valid_data:
         json_data["collectionData"] = valid_data
