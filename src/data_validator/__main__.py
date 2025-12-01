@@ -16,15 +16,18 @@ def run(paths, remove_id_pattern=True):
     # remove_id_pattern is true. Due to how the identifiers are created
     # on RegulonDB, we need to first validate the data before assigning them
     # persisting identifiers
-    schemas = utils.load_schemas(paths["schema_path"], remove_id_pattern=remove_id_pattern)
+    schemas = utils.load_schemas(
+        paths["schema_path"], remove_id_pattern=remove_id_pattern)
     jsons_data = utils.load_jsons(paths["data_path"])
     for filename, json_data in jsons_data.items():
         try:
-            print "Validating data from: {}".format(filename)
+            print(f"Validating data from: {filename}")
             collection_name = json_data["collectionName"]
-            utils.validate_data(schemas[collection_name], filename, json_data, paths["valid_path"], paths["invalid_path"], paths["log_path"])
+            utils.validate_data(schemas[collection_name], filename, json_data,
+                                paths["valid_path"], paths["invalid_path"], paths["log_path"])
         except KeyError:
-            print "There's no schema rules for {} data. Moving all the data as valid.".format(collection_name)
+            print(
+                f"There's no schema rules for {collection_name} data. Moving all the data as valid.")
 
 
 if __name__ == '__main__':
@@ -41,7 +44,8 @@ if __name__ == '__main__':
         "invalid_path": args.invalidoutputdir
     }
     run(paths, remove_id_pattern)
-    print "Results on:"
-    print "\t {} for valid data".format(paths["valid_path"])
-    print "\t {} for invalid data".format(paths["invalid_path"])
-    print "\t {} for more information about the invalid data".format(paths["log_path"])
+    print("Results on:")
+    print(f'\t {paths["valid_path"]} for valid data')
+    print(f'\t {paths["invalid_path"]} for invalid data')
+    print(
+        f'\t {paths["log_path"]} for more information about the invalid data')

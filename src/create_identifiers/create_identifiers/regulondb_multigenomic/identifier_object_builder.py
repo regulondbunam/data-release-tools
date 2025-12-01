@@ -1,8 +1,10 @@
+from .domain.additive_evidence import additive_evidence
 from .domain.evidence import evidence
 from .domain.external_cross_reference import external_cross_reference
 from .domain.gene import gene
 from .domain.motif import motif
 from .domain.ontology import ontology
+from .domain.organism import organism
 from .domain.operon import operon
 from .domain.product import product
 from .domain.promoter import promoter
@@ -39,11 +41,13 @@ def build_identifier_object(object_id, **kwargs):
 
 
 get_unique_data = {
+    "additiveEvidences": additive_evidence,
     "evidences": evidence,
     "externalCrossReferences": external_cross_reference,
     "genes": gene,
     "motifs": motif,
     "ontologies": ontology,
+    "organisms": organism,
     "operons": operon,
     "products": product,
     "promoters": promoter,
@@ -65,7 +69,7 @@ def remove_organism_property_from(identifier_object):
         identifier_object["organism"] = None
 
 
-def set_identifier_object(json_object, collection_name,  **metadata_properties):
+def set_identifier_object(json_object, collection_name, **metadata_properties):
     # print(collection_name)
     # if collection_name not in ["ontologies", "terms"] else "ontologies"
     if collection_name == "segments":

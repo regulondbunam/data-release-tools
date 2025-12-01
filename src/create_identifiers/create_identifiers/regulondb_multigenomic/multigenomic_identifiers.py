@@ -1,6 +1,7 @@
 import identifiers_api
 
 from .identifier_object_builder import set_identifier_object
+from ..lib.utils import print_progress
 
 
 def handle_id(identifier_object, collection_registered_identifiers):
@@ -25,24 +26,33 @@ def manage_ids(jsons_data, **metadata_properties):
     """
 
     organism = metadata_properties.get("organism", None)
+    # for dataset in jsons_data:
+    collection_name = jsons_data.get("collectionName", None)
+    print(f"Initializing ID generation for: {collection_name}")
+    collection_data = jsons_data.get("collectionData", None)
+    ontology_name = jsons_data.get("ontologyName", None)
 
-    for dataset in jsons_data:
-        collection_name = dataset.get("collectionName", None)
-        collection_data = dataset.get("collectionData", None)
-        ontology_name = dataset.get("ontologyName", None)
+    metadata_properties["classAcronym"] = jsons_data.get("classAcronym", None)
+    metadata_properties["subClassAcronym"] = jsons_data.get(
+        "subClassAcronym", None)
+    metadata_properties["ontologyName"] = ontology_name
 
-        metadata_properties["classAcronym"] = dataset.get("classAcronym", None)
-        metadata_properties["subClassAcronym"] = dataset.get(
-            "subClassAcronym", None)
-        metadata_properties["ontologyName"] = ontology_name
+    # Trying to obtain identifiers from the collection that is been
+    # processed, in order to check if the pre-identifier that is been
+    # processed is going to be updated or created
+    collection_identifiers = identifiers_api.regulondbmultigenomic.get_identifiers_by(
+        type=collection_name, ontology_name=ontology_name, organism=organism)
 
-        # Trying to obtain identifiers from the collection that is been
-        # processed, in order to check if the pre-identifier that is been
-        # processed is going to be updated or created
-        collection_identifiers = identifiers_api.regulondbmultigenomic.get_identifiers_by(
-            type=collection_name, ontology_name=ontology_name, organism=organism)
-
-        for json_object in collection_data:
-            identifier_object = set_identifier_object(
-                json_object, collection_name, **metadata_properties)
-            handle_id(identifier_object, collection_identifiers)
+    total_objects = len(list(collection_data))
+    processed = 0
+    for json_object in collection_data:
+        identifier_object = set_identifier_object(
+            json_object, collection_name, **metadata_properties)
+        handle_id(identifier_object, collection_identifiers)
+        processed += 1
+        print_progress(
+            current=processed,
+            total=total_objects,
+            collection_name=collection_name
+        )
+    print(f"\n{collection_name} done.")

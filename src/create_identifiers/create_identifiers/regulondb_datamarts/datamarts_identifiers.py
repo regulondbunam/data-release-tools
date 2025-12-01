@@ -5,7 +5,7 @@ from ..lib.utils import print_progress
 
 
 def handle_id(identifier_object, collection_registered_identifiers):
-    # if the identifier already exists, we will updated its
+    # if the identifier already exists, we will update it
     # lastRegulonDBVersionUsed field
     if identifier_object is not None:
         if identifier_object["_id"] in collection_registered_identifiers:
@@ -39,11 +39,12 @@ def manage_ids(json_data, **metadata_properties):
         "subClassAcronym", None)
     metadata_properties["ontologyName"] = ontology_name
 
-    # Trying to obtain identifiers from the collection that is been
-    # processed, in order to check if the pre-identifier that is been
+    # Trying to obtain identifiers from the collection that is being
+    # processed, in order to check if the pre-identifier that has been
     # processed is going to be updated or created
-    collection_identifiers = identifiers_api.regulondbht.get_identifiers_by(
+    collection_identifiers = identifiers_api.regulondbdatamarts.get_identifiers_by(
         type=collection_name, ontology_name=ontology_name, organism=organism)
+    print(len(collection_identifiers))
 
     total_objects = len(list(collection_data))
     processed = 0
