@@ -44,9 +44,17 @@ def set_log(log_path):
 def run(connection_url, database, input_path=None):
     mongodb_connection = Uploader(connection_url, database)
     # json_data = get_data(input_path)
+    print(os.listdir(input_path))
     for filename in os.listdir(input_path):
-        if os.path.isdir(os.path.join(input_path, filename)):
+        print(filename)
+        full_path = os.path.join(input_path, filename)
+        # Skip directories
+        if os.path.isdir(full_path):
             continue
+        # Skip non-JSON files
+        if not filename.lower().endswith(".json"):
+            continue
+
         filename = os.path.join(input_path, filename)
         json_data = read_json(filename)
         if json_data:
