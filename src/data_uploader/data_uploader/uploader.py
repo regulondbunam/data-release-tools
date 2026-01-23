@@ -1,59 +1,59 @@
 import logging
-
-from pymongo import MongoClient
-from pymongo import errors
+from pymongo import MongoClient, errors
 
 
-class Uploader(object):
+class Uploader:
     inconsistencies_generated = False
 
     def __init__(self, connection_url, database):
         self.client = MongoClient(connection_url)
         self.db_conn = self.client[database]
 
+    def close(self):
+        try:
+            self.client.close()
+        except Exception:
+            logging.exception("Error closing MongoClient")
+
     def upload_object(self, collection_name, json_object):
         if collection_name in self.db_conn.list_collection_names():
             collection = self.db_conn[collection_name]
             try:
                 collection.insert_one(json_object)
-                logging.info('Working on collection: {}; object: {} loaded correctly'.format(collection_name, json_object["_id"]))
-                print('Working on collection: {}; object: {} loaded correctly'.format(collection_name, json_object["_id"]))
+                logging.info(
+                    "Working on collection: %s; object: %s loaded correctly",
+                    collection_name, json_object.get("_id")
+                )
+                print(
+                    f'Working on collection: {collection_name}; object: {json_object.get("_id")} loaded correctly',
+                    flush=True
+                )
                 Uploader.inconsistencies_generated = True
 
-            except errors.DuplicateKeyError as duplicate_key_error:
-                '''
-                # Future programer this will update the collection while uploading
-                # but in this moment we reset all collections before uploading
-                pint(json_object)
-                collection.update_one( 
-                    {
-                        "_id": json_object["_id"]
-                    }
+            except errors.DuplicateKeyError:
+                logging.error(
+                    "Working on collection: %s; object: %s duplicate key error",
+                    collection_name, json_object.get("_id")
                 )
-                '''
-                logging.error('Working on collection: {}; object: {} duplicate key error'.format(collection_name, json_object["_id"]))
-                print('Working on collection: {}; object: {} duplicate key error'.format(collection_name, json_object["_id"]))
+                print(
+                    f'Working on collection: {collection_name}; object: {json_object.get("_id")} duplicate key error',
+                    flush=True
+                )
                 Uploader.inconsistencies_generated = True
 
             except errors.WriteError as write_error:
-                logging.error('Working on collection: {}; object: {}; details: {}'.format(collection_name, json_object["_id"], write_error.details["errmsg"]))
-                print('Working on collection: {}; object: {}; details: {}'.format(collection_name, json_object["_id"], write_error.details["errmsg"]))
+                msg = write_error.details.get("errmsg") if write_error.details else str(write_error)
+                logging.error(
+                    "Working on collection: %s; object: %s; details: %s",
+                    collection_name, json_object.get("_id"), msg
+                )
+                print(
+                    f'Working on collection: {collection_name}; object: {json_object.get("_id")}; details: {msg}',
+                    flush=True
+                )
                 Uploader.inconsistencies_generated = True
 
             else:
                 Uploader.inconsistencies_generated = False
 
         return Uploader.inconsistencies_generated
-
-    def upload_json_bulk(self, collection_name, json_bulk):
-        if collection_name in self.db_conn.collection_names():
-            collection = self.db_conn[collection_name]
-            try:
-                collection.insert_many(json_bulk)
-            except errors.BulkWriteError as bulk_error:
-                print(bulk_error)
-                print(bulk_error.details)
-                raise
-
-    def __del__(self):
-        self.client.close()

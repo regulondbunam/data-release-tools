@@ -6,76 +6,63 @@ from data_uploader import arguments
 from data_uploader.uploader import Uploader
 
 
-def get_data(directory):
-    collection_data = {}
-    for filename in os.listdir(directory):
-        if os.path.isdir(os.path.join(directory, filename)):
-            continue
-        filename = os.path.join(directory, filename)
-        json_data = read_json(filename)
-        if json_data:
-            collection_name = json_data["collectionName"]
-            data = json_data["collectionData"]
-            collection_data.setdefault(collection_name, []).extend(data)
-    return collection_data
-
-
 def read_json(filename):
     with open(filename, 'r') as fp:
         try:
-            json_data = json.loads(fp.read())
-        except ValueError as value_error:
-            print("{} is not a valid json file. File is being ignored.".format(filename))
-            json_data = {}
-    return json_data
+            return json.loads(fp.read())
+        except ValueError:
+            print(f"{filename} is not a valid json file. File is being ignored.", flush=True)
+            return {}
 
 
 def set_log(log_path):
     if not os.path.isdir(log_path):
-        raise IOError(
-            "{} directory does not exist, please edit your log argument value".format(log_path))
+        raise IOError(f"{log_path} directory does not exist, please edit your log argument value")
     log_path = os.path.join(log_path, 'data_uploader.log')
-    logging.basicConfig(filename=log_path,
-                        format='%(levelname)s - %(asctime)s - %(message)s', filemode='w', level=logging.INFO)
-
+    logging.basicConfig(
+        filename=log_path,
+        format='%(levelname)s - %(asctime)s - %(message)s',
+        filemode='w',
+        level=logging.INFO
+    )
     return log_path
 
 
 def run(connection_url, database, input_path=None):
     mongodb_connection = Uploader(connection_url, database)
-    # json_data = get_data(input_path)
-    print(os.listdir(input_path))
-    for filename in os.listdir(input_path):
-        print(filename)
-        full_path = os.path.join(input_path, filename)
-        # Skip directories
-        if os.path.isdir(full_path):
-            continue
-        # Skip non-JSON files
-        if not filename.lower().endswith(".json"):
-            continue
+    try:
+        for filename in os.listdir(input_path):
+            full_path = os.path.join(input_path, filename)
+            if os.path.isdir(full_path):
+                continue
+            if not filename.lower().endswith(".json"):
+                continue
 
-        filename = os.path.join(input_path, filename)
-        json_data = read_json(filename)
-        if json_data:
+            json_data = read_json(full_path)
+            if not json_data:
+                continue
+
             collection_name = json_data["collectionName"]
             data = json_data["collectionData"]
-        # collection_data.setdefault(collection_name, []).extend(data)
-        # for collection_name, json_data in json_data.items():
-        logging.info(f'Working on collection: {collection_name}')
-        print(f'Working on collection: {collection_name}')
-        for json_object in data:
-            mongodb_connection.upload_object(collection_name, json_object)
+
+            logging.info('Working on collection: %s', collection_name)
+            print(f'Working on collection: {collection_name}', flush=True)
+
+            for json_object in data:
+                mongodb_connection.upload_object(collection_name, json_object)
+    finally:
+        # clave: cerrar explícitamente ANTES del shutdown del intérprete
+        mongodb_connection.close()
 
 
 if __name__ == '__main__':
     args = arguments.load()
-    log_path = args.log
-    mongodb_url = args.url
-    database = args.database
+    log_path = set_log(args.log)
 
-    input_path = args.inputdir
-    log_path = set_log(log_path)
-    run(mongodb_url, database, input_path)
-    print("Process finished, check: {}, for more info".format(log_path))
-    print('end')
+    run(args.url, args.database, args.inputdir)
+
+    print(f"Process finished, check: {log_path}, for more info", flush=True)
+    print("end", flush=True)
+
+    # opcional pero recomendable: fuerza cierre de handlers de logging
+    logging.shutdown()
