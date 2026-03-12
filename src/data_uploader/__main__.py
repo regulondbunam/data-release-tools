@@ -1,4 +1,5 @@
 import json
+from sys import stdout
 import os
 import logging
 
@@ -27,6 +28,31 @@ def set_log(log_path):
     )
     return log_path
 
+def print_progress(current, total, collection_name, bar_length=40):
+        """
+        Displays a real-time progress bar in the console, updating on the same line.
+
+        This function calculates the completion fraction, generates a visual progress
+        bar using block characters, and outputs the progress percentage and current
+        count relative to the total.
+
+        Args:
+            current (int): The number of items currently processed.
+            total (int): The total number of items to be processed.
+            collection_name (str): The name of the collection or process being tracked.
+            bar_length (int, optional): The fixed length of the progress bar display.
+                                        Defaults to 40.
+
+        Returns:
+            None: The function only performs output to stdout.
+        """
+        fraction = current / total if total else 1
+        filled = int(bar_length * fraction)
+        bar = "█" * filled + "-" * (bar_length - filled)
+        percent = int(fraction * 100)
+        stdout.write(f"\rProcessing {collection_name}: |{bar}| {percent}% ({current}/{total})")
+        stdout.flush()
+
 
 def run(connection_url, database, input_path=None):
     mongodb_connection = Uploader(connection_url, database)
@@ -48,10 +74,13 @@ def run(connection_url, database, input_path=None):
             logging.info('Working on collection: %s', collection_name)
             print(f'Working on collection: {collection_name}', flush=True)
 
+            total_objects = len(list(data))
+            processed = 0
             for json_object in data:
-                mongodb_connection.upload_object(collection_name, json_object)
+                if not mongodb_connection.upload_object(collection_name, json_object):
+                    processed += 1
+                print_progress(processed, total_objects, collection_name)
     finally:
-        # clave: cerrar explícitamente ANTES del shutdown del intérprete
         mongodb_connection.close()
 
 
@@ -64,5 +93,4 @@ if __name__ == '__main__':
     print(f"Process finished, check: {log_path}, for more info", flush=True)
     print("end", flush=True)
 
-    # opcional pero recomendable: fuerza cierre de handlers de logging
     logging.shutdown()

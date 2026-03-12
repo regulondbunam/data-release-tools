@@ -16,44 +16,44 @@ class Uploader:
             logging.exception("Error closing MongoClient")
 
     def upload_object(self, collection_name, json_object):
-        if collection_name in self.db_conn.list_collection_names():
-            collection = self.db_conn[collection_name]
-            try:
-                collection.insert_one(json_object)
-                logging.info(
-                    "Working on collection: %s; object: %s loaded correctly",
-                    collection_name, json_object.get("_id")
-                )
-                print(
-                    f'Working on collection: {collection_name}; object: {json_object.get("_id")} loaded correctly',
-                    flush=True
-                )
-                Uploader.inconsistencies_generated = True
+        if collection_name not in self.db_conn.list_collection_names():
+            logging.error("Collection does not exist: %s", collection_name)
+            Uploader.inconsistencies_generated = True
+            return Uploader.inconsistencies_generated
 
-            except errors.DuplicateKeyError:
-                logging.error(
-                    "Working on collection: %s; object: %s duplicate key error",
-                    collection_name, json_object.get("_id")
-                )
-                print(
-                    f'Working on collection: {collection_name}; object: {json_object.get("_id")} duplicate key error',
-                    flush=True
-                )
-                Uploader.inconsistencies_generated = True
+        collection = self.db_conn[collection_name]
 
-            except errors.WriteError as write_error:
-                msg = write_error.details.get("errmsg") if write_error.details else str(write_error)
-                logging.error(
-                    "Working on collection: %s; object: %s; details: %s",
-                    collection_name, json_object.get("_id"), msg
-                )
-                print(
-                    f'Working on collection: {collection_name}; object: {json_object.get("_id")}; details: {msg}',
-                    flush=True
-                )
-                Uploader.inconsistencies_generated = True
+        try:
+            collection.insert_one(json_object)
+            Uploader.inconsistencies_generated = False
 
-            else:
-                Uploader.inconsistencies_generated = False
+        except errors.DuplicateKeyError as duplicate_error:
+            logging.error(
+                "Working on collection: %s; object: %s; duplicate key error: %s",
+                collection_name, json_object.get("_id"), str(duplicate_error)
+            )
+            Uploader.inconsistencies_generated = True
+
+        except errors.WriteError as write_error:
+            msg = write_error.details.get("errmsg") if write_error.details else str(write_error)
+            logging.error(
+                "Working on collection: %s; object: %s; write error: %s",
+                collection_name, json_object.get("_id"), msg
+            )
+            Uploader.inconsistencies_generated = True
+
+        except errors.PyMongoError as mongo_error:
+            logging.error(
+                "Working on collection: %s; object: %s; pymongo error: %s; type: %s",
+                collection_name, json_object.get("_id"), str(mongo_error), type(mongo_error).__name__
+            )
+            Uploader.inconsistencies_generated = True
+
+        except Exception as unexpected_error:
+            logging.error(
+                "Working on collection: %s; object: %s; unexpected error: %s; type: %s",
+                collection_name, json_object.get("_id"), str(unexpected_error), type(unexpected_error).__name__
+            )
+            Uploader.inconsistencies_generated = True
 
         return Uploader.inconsistencies_generated
